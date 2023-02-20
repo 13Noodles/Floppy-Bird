@@ -1,0 +1,28 @@
+#ifndef FLOPPY_BIRD_DRAW_H
+#define FLOPPY_BIRD_DRAW_H
+
+#include "SDL2/SDL_render.h"
+#include "entities.h"
+#include "settings.h"
+
+void draw(SDL_Renderer *renderer, struct GameObjects objects,
+          struct GameTextures game_textures,
+          struct DisplaySettings display_settings);
+
+void draw_background(SDL_Renderer *renderer,
+                     struct Spritesheet background_spritesheet);
+
+void draw_player(SDL_Renderer *renderer, struct Player,
+                 struct Spritesheet player_spritesheet);
+
+void draw_obstacles(SDL_Renderer *renderer,
+                    struct Obstacle obstacles[MAX_OBSTACLES],
+                    struct Spritesheet obstacle_spritesheet);
+
+int rect_from_sprite_id(struct Spritesheet spritesheet, int sprite_id,SDL_Rect *rect);
+
+static inline void set_color(SDL_Renderer *renderer, SDL_Color color) {
+  SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+}
+
+#endif // FLOPPY_BIRD_DRAW_H
