@@ -4,7 +4,7 @@ void process_events(struct Game *game) {
   SDL_Event event;
   while (SDL_PollEvent(&event)) {
     if (event.type == SDL_QUIT) {
-      stop_game(game);
+      game_stop(game);
     } else if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
       process_key_event(game, event.key.keysym.sym,
                         event.key.state == SDL_PRESSED);
@@ -18,7 +18,7 @@ void process_events(struct Game *game) {
 
 void process_key_event(struct Game *game, SDL_Keycode key, bool pressed) {
   if (key == SDLK_ESCAPE) {
-    stop_game(game);
+    game_stop(game);
     return;
   }
   if (pressed) {
@@ -29,7 +29,7 @@ void process_key_event(struct Game *game, SDL_Keycode key, bool pressed) {
         game_resume(game);
       }
     } else if(game->state == STATE_PLAYING){
-      if(key == SDLK_LSHIFT){
+      if(key == SDLK_LSHIFT || key == SDLK_RSHIFT){
         game_pause(game);
       }else if (key == SDLK_SPACE || key == SDLK_z || key == SDLK_UP) {
         jump(&game->game_objects.player, game->game_settings.JUMP_STRENGTH);

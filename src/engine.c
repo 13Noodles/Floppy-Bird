@@ -102,29 +102,4 @@ int jump(struct Player *player, int jump_strength) {
   return 0;
 }
 
-int add_obstacle(struct Obstacle obstacles[MAX_OBSTACLES],
-                 struct GameSettings game_settings) {
-  int obstacle_id = 0;
-  int passage_height = game_settings.OBSTACLE_PASSAGE_MIN_HEIGHT +
-                       rand() % (game_settings.OBSTACLE_PASSAGE_MAX_HEIGHT -
-                                 game_settings.OBSTACLE_PASSAGE_MIN_HEIGHT);
-  int top_obstacle_height =
-      rand() % (game_settings.PLAY_AREA.h - passage_height);
 
-  obstacles[obstacle_id].top_rect.x =
-      game_settings.PLAY_AREA.x + game_settings.PLAY_AREA.w;
-  obstacles[obstacle_id].top_rect.y = game_settings.PLAY_AREA.y;
-  obstacles[obstacle_id].top_rect.w = game_settings.OBSTACLE_WIDTH;
-  obstacles[obstacle_id].top_rect.h = top_obstacle_height;
-
-  obstacles[obstacle_id].bottom_rect.x =
-      game_settings.PLAY_AREA.x + game_settings.PLAY_AREA.w;
-  obstacles[obstacle_id].bottom_rect.y = top_obstacle_height + passage_height;
-  obstacles[obstacle_id].bottom_rect.w = game_settings.OBSTACLE_WIDTH;
-  obstacles[obstacle_id].bottom_rect.h =
-      game_settings.PLAY_AREA.h - obstacles[obstacle_id].bottom_rect.y;
-  obstacles[obstacle_id].is_used = true;
-  obstacles[obstacle_id].sprite_id = rand() % 2;
-  printf("obstacle added\n");
-  return 0;
-}

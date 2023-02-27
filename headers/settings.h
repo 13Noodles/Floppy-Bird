@@ -4,6 +4,7 @@
 #include "SDL_pixels.h"
 #include "SDL_render.h"
 #include "SDL_stdinc.h"
+#include "SDL_ttf.h"
 #include "settingsValues.h"
 #include "entities.h"
 
@@ -36,25 +37,57 @@ struct GameObjects {
 struct Spritesheet {
   SDL_Texture *texture;
   SDL_Rect sprite_size;
-  int columns;
-  int rows;
+  unsigned int columns;
+  unsigned int rows;
 };
 
-struct GameTextures {
+struct Message {
+  SDL_FRect draw_rect;
+  SDL_FRect box_rect;
+  SDL_Texture *texture;
+  TTF_Font *font;
+  SDL_Color color;
+  enum MessageAlignement alignement;
+  enum MessageFitBox fit;
+  bool is_to_be_drawn;
+  bool texture_needs_update;
+  char text[MESSAGE_TEXT_LENGTH];
+};
+
+struct GameSpritesheets {
   struct Spritesheet player_spritesheet;
   struct Spritesheet obstacle_spritesheet;
   struct Spritesheet background_spritesheet;
 };
 
-struct GameTexturesPaths {
+struct GameMessages {
+  struct Message score_message;
+  struct Message game_over_message;
+  struct Message pause_message;
+  struct Message *messages_array[3];
+  size_t message_count;
+};
+
+struct GameFonts {
+  TTF_Font *default_font;
+  TTF_Font *debug_font;
+};
+
+struct TexturesPaths {
   const char* player_spritesheet_path;
   const char* obstacle_spritesheet_path;
   const char* background_spritesheet_path;
 };
 
-struct TexturesSettings{ // will change to implement spritesheets
-  struct GameTextures textures;
-  struct GameTexturesPaths textures_paths;
+struct FontsPaths {
+  const char* default_font_path;
+  const char* debug_font_path;
 };
+
+struct GamePathSettings{
+  struct FontsPaths fonts_paths;
+  struct TexturesPaths textures_paths;
+};
+
 
 #endif // FLOPPY_BIRD_SETTINGS_H

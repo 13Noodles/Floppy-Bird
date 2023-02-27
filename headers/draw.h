@@ -3,10 +3,12 @@
 
 #include "SDL2/SDL_render.h"
 #include "entities.h"
+#include "message.h"
 #include "settings.h"
 
 void draw(SDL_Renderer *renderer, struct GameObjects objects,
-          struct GameTextures game_textures,
+          struct GameSpritesheets game_spritesheets,
+          struct GameMessages *game_messages,
           struct DisplaySettings display_settings);
 
 void draw_background(SDL_Renderer *renderer,
@@ -19,8 +21,13 @@ void draw_obstacles(SDL_Renderer *renderer,
                     struct Obstacle obstacles[MAX_OBSTACLES],
                     struct Spritesheet obstacle_spritesheet);
 
-int rect_from_sprite_id(struct Spritesheet spritesheet, int sprite_id,SDL_Rect *rect);
+void draw_messages(SDL_Renderer *renderer, struct GameMessages messages);
 
+
+int rect_from_sprite_id(struct Spritesheet spritesheet, unsigned int sprite_id,
+                        SDL_Rect *rect);
+
+void update_messages_textures(SDL_Renderer *renderer, struct GameMessages *messages);
 static inline void set_color(SDL_Renderer *renderer, SDL_Color color) {
   SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 }

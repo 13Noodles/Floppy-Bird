@@ -3,8 +3,8 @@
 #include <time.h> // used as seed for srand
 
 #include "SDL2/SDL.h"
-// #include "SDL2/SDL_image.h"
-// #include "SDL2/SDL_ttf.h"
+#include "SDL2/SDL_image.h"
+#include "SDL2/SDL_ttf.h"
 
 #include "settings.h"
 #include "settingsValues.h"
@@ -23,10 +23,10 @@ int main() {
       return -1;
   }
 
-  /*if (TTF_Init() < 0) {
+  if (TTF_Init() < 0) {
       printf("SDL_TTF init error : %s\n", TTF_GetError());
       return -1;
-  }*/
+  }
 
   int window_width, window_height;
   #if (WINDOW_USE_FIXED_SIZE == false)
@@ -35,14 +35,12 @@ int main() {
     window_width = DISPLAY_MODE.w * WINDOW_WIDTH_DISPLAY_RATIO;
     window_height = DISPLAY_MODE.h * WINDOW_HEIGHT_DISPLAY_RATIO;
   #else 
-    printf("bup\n");
     window_width = WINDOW_WIDTH;
     window_height = WINDOW_HEIGHT;
   #endif
   SDL_Window *window = SDL_CreateWindow(
       "13Noodles' Floppy Bird", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
       window_width, window_height,
-      // hmm... workin' yes but not funny haha, funny weird
       // don't touch that change WINDOW_BORDERLESS in headers/settings.h instead
       WINDOW_BORDERLESS ? SDL_WINDOW_BORDERLESS : 0);
   if (window == NULL) {
@@ -61,19 +59,11 @@ int main() {
   printf("Using [%d] as seed.\n", seed);
   int player_size = SDL_min(window_width/10,window_height/10);
   struct Game game = {
-    .state = STATE_PLAYING,
-    .game_objects = {
-      {
-        .velocity_y = 0.0f,
-        .rect = {(float)window_width/4,(float)window_height/2-player_size,player_size,player_size},
-        .is_diving = false
-      },
-      {}
-    },
+    .state = STATE_PLAYING, 
     .game_settings = {
       .FPS = FPS_MAX,
-      .GRAVITY_STRENGTH = window_height/100.0f,
-      .JUMP_STRENGTH = window_height/15.0f,
+      .GRAVITY_STRENGTH = 2*window_height/100.0f,
+      .JUMP_STRENGTH = window_height/20.0f,
       .PLAY_AREA = {0,0,window_width,window_height},
       .OBSTACLE_PASSAGE_MIN_HEIGHT = player_size*2,
       .OBSTACLE_PASSAGE_MAX_HEIGHT = window_height/3*2,
@@ -86,21 +76,64 @@ int main() {
           .player_border_color = {200, 0, 0, SDL_ALPHA_OPAQUE},
           .obstacle_color = {0, 100, 0, SDL_ALPHA_OPAQUE},
           .obstacle_border_color = {200, 0, 0, SDL_ALPHA_OPAQUE},
-      .window_width = window_width,
-      .window_height = window_height
+          .window_width = window_width,
+          .window_height = window_height
     },
-    .texture_settings = {
-      .textures = {},
+    .spritesheets = {
+      .player_spritesheet = {},
+      .obstacle_spritesheet = {},
+      .background_spritesheet = {} 
+    },
+    .messages = {
+      .score_message = {
+        .box_rect = {0,0,window_width,window_height/20.0f},
+        .color = {255,255,255,SDL_ALPHA_OPAQUE},
+        .alignement = ALIGN_MIDDLE_RIGHT,
+        .fit = FIT_BOX,
+        .is_to_be_drawn = false // just in case I forget to initialize //DEBUG REMOVE ME
+      },
+      .game_over_message = {
+        .box_rect = {window_width/6.0f,window_height/6.0f,window_width*2/3.0f,window_height*2/3.0f},
+        .color = {255,55,55,SDL_ALPHA_OPAQUE},
+        .alignement = ALIGN_CENTER,
+        .fit = FIT_BOX,
+        .text = "Game over, press [R] to replay",
+        .is_to_be_drawn = false
+      },
+      .pause_message = {
+        .box_rect = {window_width/6.0f,0,window_width*2/3.0f,window_height*9/10.0f},
+        .color = {255,255,255,SDL_ALPHA_OPAQUE},
+        .alignement = ALIGN_BOTTOM_MIDDLE,
+        .fit = FIT_BOX,
+        .text = "Game paused, press [LSHIFT] or [RSHIFT] to resume",
+        .is_to_be_drawn = false
+      }
+
+    },
+    .paths_settings = {
+      .fonts_paths = {
+        .default_font_path = "assets/PressStart2P.ttf",
+        .debug_font_path = "assets/PressStart2P.ttf"
+      },
       .textures_paths = {
         .player_spritesheet_path = "assets/birds.png",
         .obstacle_spritesheet_path = "assets/pipes.png",
         .background_spritesheet_path = "assets/backgrounds.png"
       }
     },
+    .game_objects = {
+      {
+        .velocity_y = 0.0f,
+        .rect = {window_width/4, window_height/2-player_size,player_size,player_size},
+        .is_diving = false
+      },
+      {}
+    },
     .score = 0
   };
   if(initialize_game(&game,renderer) != 0){
-    stop_game(&game);
+    destroy_game(&game);
+    TTF_Quit();
     IMG_Quit();
     SDL_Quit();
     return EXIT_FAILURE;
@@ -116,13 +149,14 @@ int main() {
     if (delta_ms > time_per_frame) {
       process_events(&game);
       update(&game, delta_ms);
-      draw(renderer, game.game_objects, game.texture_settings.textures,game.display_settings);
+      draw(renderer, game.game_objects, game.spritesheets,&game.messages,game.display_settings);
       start_time = end_time;
     } else {
       SDL_Delay(time_per_frame - delta_ms);
     }
   }
-
+  destroy_game(&game);
+  TTF_Quit();
   IMG_Quit();
   SDL_Quit();
   return EXIT_SUCCESS;

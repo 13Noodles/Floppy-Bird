@@ -7,7 +7,7 @@
 #include "settings.h"
 #include "game.h"
 
-void update(game_t *game,
+void update(struct Game *game,
             Uint32 delta_ms);
 int update_player(struct Player *player, struct GameSettings game_settings,
                   Uint32 delta_ms);
@@ -21,6 +21,4 @@ int start_diving(struct Player *player);
 int stop_diving(struct Player *player);
 int jump(struct Player *player, int jump_strength);
 
-int add_obstacle(struct Obstacle obstacles[MAX_OBSTACLES],
-                 struct GameSettings game_settings);
 #endif // FLOPPY_BIRD_UPDATE_H
